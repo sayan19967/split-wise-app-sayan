@@ -3,7 +3,11 @@ import Card from "./Card";
 
 // props:
 //   data: consists of data records to be rendered
-const List = ({ data, cardPersonNameOnChangeHandler, cardAmountOnChangeHandler, removePersonHandler }) => {
+const List = ({ data, 
+  cardPersonNameOnChangeHandler, 
+  cardAmountOnChangeHandler, 
+  removePersonHandler, 
+  personCardAmountErrorMsg }) => {
   // console.log("+++++++++++++++++++");
   // console.log(data);
   // console.log("+++++++++++++++++++");
@@ -31,6 +35,7 @@ const List = ({ data, cardPersonNameOnChangeHandler, cardAmountOnChangeHandler, 
               cardPersonNameOnChangeHandler={cardPersonNameOnChangeHandler}
               cardAmountOnChangeHandler={cardAmountOnChangeHandler}
               removePersonHandler={removePersonHandler}
+              personCardAmountErrorMsg={personCardAmountErrorMsg}
             />
             
           )

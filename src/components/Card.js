@@ -23,7 +23,8 @@ const Card = ({
   inrShare,
   cardPersonNameOnChangeHandler,
   cardAmountOnChangeHandler,
-  removePersonHandler
+  removePersonHandler,
+  personCardAmountErrorMsg
 }) => {
   //console.log("hola inside card");
   //<span className="a">{item.value}</span>
@@ -35,11 +36,19 @@ const Card = ({
     if (item._id === 'No.') {
       //console.log(item._id + " " + item.val);
       //counter++;
-      return <span key={`header_col-${counter}`} id={`header_col-${++counter}`} className="a">{item.val}</span>;
+      let ele = null;
+      let err = personCardAmountErrorMsg == null ? null : (<p className="small-txt">{personCardAmountErrorMsg}</p>)
+      if(item.val == 'Amount Paid'){
+        ele = <span key={`header_col-${counter}`} id={`header_col-${++counter}`} className="a">{item.val}{err}</span>;
+      }else{
+        ele = <span key={`header_col-${counter}`} id={`header_col-${++counter}`} className="a">{item.val}</span>;
+      }
+      
+      return ele;
     } else {
       //console.log(item._id + " " + item.val)
       if (typeof item.val === 'number') {
-        return <input key={`amount-${item._id}`} id={`amount-${item._id}`} type='number'
+        return <input key={`amount-${item._id}`} id={`amount-${item._id}`} type='text'
           className="a" value={item.val} onChange={cardAmountOnChangeHandler} />;
       } else {
         return <input key={`name-${item._id}`} id={`name-${item._id}`} type='text' className="a"

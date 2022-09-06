@@ -39,7 +39,11 @@ export class App extends Component {
       formError: undefined,
       usdToInrRate: 0,
       totalUSDDeduction: 0,
-      totalINRDeduction: 0
+      totalINRDeduction: 0,
+      usdToInrRateErrorMsg: null,
+      totalUSDDeductionErrorMsg: null,
+      totalINRDeductionErrorMsg: null,
+      personCardAmountErrorMsg: null
     }
   }
 
@@ -54,11 +58,11 @@ export class App extends Component {
 
   truncateDecimals = (number, digits) => {
     let multiplier = Math.pow(10, digits),
-        adjustedNum = number * multiplier,
-        truncatedNum = Math[adjustedNum < 0 ? 'ceil' : 'floor'](adjustedNum);
+      adjustedNum = number * multiplier,
+      truncatedNum = Math[adjustedNum < 0 ? 'ceil' : 'floor'](adjustedNum);
 
     return truncatedNum / multiplier;
-};
+  };
 
   // Function to Show the Modal component
   showModalHandler = () => {
@@ -95,32 +99,44 @@ export class App extends Component {
     let { name, value, type } = e.target;
     let { formValues, data } = this.state;
     //formValues = { ...formValues, [name]: type === "number" ? parseInt(value) : value };
-    //console.log(e.target)
-    value = (type === "number") ? parseFloat(value) : value;
-    await this.setState({
-      [name]: value
-    });
-    if(data.length > 1){
-      const newData = this.calculateUsdAndInrShare(data, formValues);
-      // console.log("qqqqqqqqqqqqqqqqqq");
-      // console.log(value);
-      // console.log(newData);
-      // console.log("qqqqqqqqqqqqqqqqqq");
-      this.setState({
-        data: [tableHeader, ...newData],
+    console.log(e.target)
+    console.log(value)
+    if(this.validateIfStringHasDigitsOnly(value)) {
+      value = (type === "number") ? parseFloat(value) : value;
+      await this.setState({
+        [name]: value,
+        [name+"ErrorMsg"]: null
       });
+      if (data.length > 1) {
+        const newData = this.calculateUsdAndInrShare(data, formValues);
+        // console.log("qqqqqqqqqqqqqqqqqq");
+        // console.log(value);
+        // console.log(newData);
+        // console.log("qqqqqqqqqqqqqqqqqq");
+        this.setState({
+          data: [tableHeader, ...newData],
+        });
+      }
+      //console.log(this.state)
+    }else{
+      console.log(value)
+      await this.setState((prevState, props) => ({
+        //[name]: prevState.usdToInrRate,
+        [name+"ErrorMsg"]: "Please enter digits only!"
+      }));
+      console.log(this.state.usdToInrRate);
+      console.log(this.state.usdToInrRateErrorMsg);
     }
-    //console.log(this.state)
   }
 
   inputCardPersonNameOnChangeHandler = async (e) => {
-    const {id, type, value} = e.target, {data} = this.state;
+    const { id, type, value } = e.target, { data } = this.state;
     console.log("changed name " + value);
     console.log(data)
     data.every((item) => {
       console.log("item._id=" + item._id);
       console.log("id.split('-')[1]=" + id.split('-')[1]);
-      if(item._id == id.split('-')[1]){
+      if (item._id == id.split('-')[1]) {
         item.personName = value;
         console.log("inside if");
         return false;//break from this loop
@@ -137,35 +153,45 @@ export class App extends Component {
   }
 
   inputCardAmountOnChangeHandler = async (e) => {
-    const {id, type, value} = e.target, {data, formValues} = this.state;
+    const { id, type, value } = e.target, { data, formValues } = this.state;
     console.log("changed amount " + value);
     console.log(data);
-    data.every((item) => {
-      console.log("item._id=" + item._id);
-      console.log("id.split('-')[1]=" + id.split('-')[1]);
-      if(item._id == id.split('-')[1]){
-        item.amount = parseFloat(value);
-        console.log("inside if")
-        return false;//break from this loop
-      }
-      return true;
-    });
-    console.log("eeeeeeeeeeeeee")
-    console.log(data)
-    console.log("eeeeeeeeeeeee")
-    const newData = this.calculateUsdAndInrShare(data, formValues);
-    console.log("wwwwwwwwwwww")
-    console.log(newData)
-    console.log("wwwwwwwwwwww")
-    this.setState({
-      data: [tableHeader, ...newData]
-    });
-    // console.log("confirmation of state change")
-    // console.log(this.state.data)
+    if(this.validateIfStringHasDigitsOnly(value)){
+      data.every((item) => {
+        console.log("item._id=" + item._id);
+        console.log("id.split('-')[1]=" + id.split('-')[1]);
+        if (item._id == id.split('-')[1]) {
+          item.amount = parseFloat(value);
+          console.log("inside if of inputCardAmountOnChangeHandler() every data loop")
+          return false;//break from this loop
+        }
+        return true;
+      });
+      console.log("eeeeeeeeeeeeee")
+      console.log(data)
+      console.log("eeeeeeeeeeeee")
+      const newData = this.calculateUsdAndInrShare(data, formValues);
+      console.log("wwwwwwwwwwww")
+      console.log(newData)
+      console.log("wwwwwwwwwwww")
+      this.setState({
+        data: [tableHeader, ...newData],
+        personCardAmountErrorMsg: null
+      });
+      // console.log("confirmation of state change")
+      // console.log(this.state.data)
+    }else{
+      //console.log(value)
+      await this.setState((prevState, props) => ({
+        personCardAmountErrorMsg: "Please enter digits only!"
+      }));
+      console.log(data);
+    }
+    
   }
 
   removePersonHandler = (e, id) => {
-    const {data, formValues} = this.state;
+    const { data, formValues } = this.state;
     //console.log("e.traget=");
     console.log(id);
     console.log(e)
@@ -225,46 +251,52 @@ export class App extends Component {
       //console.log(this.state.data);
       //this.componentDidMount();
     }
-}
+  }
 
-  calculateUsdAndInrShare =  (data, formValues) => {
-      let totalAmount, totalAmountAfterUsdDeduction, totalAmountAfterInrDeduction, newData;
-      data = data.filter((item) => typeof item.amount === 'number');
-      // console.log('----------');
-      // console.log(data);
-      // console.log('----------');
-      if(typeof formValues?.amount === 'number'){
-        data.push(formValues);
-      }
-      // console.log('----------');
-      // console.log(data);
-      // console.log('----------');
-      totalAmount = data.reduce((prevAmount, currItem) => {
-          //console.log(prevAmount);
-          //console.log(currItem);
-          return prevAmount + currItem.amount}, 0);
-      totalAmountAfterUsdDeduction = totalAmount - this.state.totalUSDDeduction;
-      totalAmountAfterInrDeduction = totalAmountAfterUsdDeduction * this.state.usdToInrRate - this.state.totalINRDeduction;
-       console.log('************');
-       console.log(totalAmountAfterUsdDeduction);
-       console.log(this.state.usdToInrRate);
-       console.log(this.state.totalINRDeduction);
-       console.log(totalAmountAfterInrDeduction);
-       console.log('************');
-      newData = data.map((item) => {
-        item.usdShare = this.truncateDecimals(totalAmountAfterUsdDeduction * (item.amount / totalAmount), 2);
-        item.inrShare = this.truncateDecimals(totalAmountAfterInrDeduction * (item.amount / totalAmount), 2);
-        return item;
-      })
-      console.log("--------------")
-      console.log(newData)
-      console.log("--------------")
-      return newData;
+  calculateUsdAndInrShare = (data, formValues) => {
+    let totalAmount, totalAmountAfterUsdDeduction, totalAmountAfterInrDeduction, newData;
+    data = data.filter((item) => typeof item.amount === 'number');
+    // console.log('----------');
+    // console.log(data);
+    // console.log('----------');
+    if (typeof formValues?.amount === 'number') {
+      data.push(formValues);
+    }
+    // console.log('----------');
+    // console.log(data);
+    // console.log('----------');
+    totalAmount = data.reduce((prevAmount, currItem) => {
+      //console.log(prevAmount);
+      //console.log(currItem);
+      return prevAmount + currItem.amount
+    }, 0);
+    totalAmountAfterUsdDeduction = totalAmount - this.state.totalUSDDeduction;
+    totalAmountAfterInrDeduction = totalAmountAfterUsdDeduction * this.state.usdToInrRate - this.state.totalINRDeduction;
+    console.log('************');
+    console.log(totalAmountAfterUsdDeduction);
+    console.log(this.state.usdToInrRate);
+    console.log(this.state.totalINRDeduction);
+    console.log(totalAmountAfterInrDeduction);
+    console.log('************');
+    newData = data.map((item) => {
+      item.usdShare = this.truncateDecimals(totalAmountAfterUsdDeduction * (item.amount / totalAmount), 2);
+      item.inrShare = this.truncateDecimals(totalAmountAfterInrDeduction * (item.amount / totalAmount), 2);
+      return item;
+    })
+    console.log("--------------")
+    console.log(newData)
+    console.log("--------------")
+    return newData;
+  }
+
+  validateIfStringHasDigitsOnly = (inStr) => {
+    const re = /^[0-9.]+$/;
+    return re.test(inStr);
   }
 
   render() {
-    const { showModal, error, data, formError, usdToInrRate, totalUSDDeduction
-      , totalINRDeduction } = this.state;
+    const { showModal, error, data, formError, usdToInrRate, totalUSDDeduction, totalINRDeduction, 
+      usdToInrRateErrorMsg, totalUSDDeductionErrorMsg, totalINRDeductionErrorMsg, personCardAmountErrorMsg } = this.state;
     //console.log('hola');
     //console.log(totalUSDDeduction);
     return (
@@ -285,25 +317,30 @@ export class App extends Component {
                   <td className='a'><label >USD To INR Rate</label></td>
                   <td>
                     <input onChange={this.inputRateOrDeductionChangeHandler}
-                      type="number" name="usdToInrRate"
+                      type="text" name="usdToInrRate"
                       title="usdToInrRate" placeholder={"Current Rate : " + usdToInrRate}
+                      style={usdToInrRateErrorMsg == null ? null : ({borderColor:"red"})}
                     />
+                    {usdToInrRateErrorMsg == null ? null : (<p className='small-txt'>{usdToInrRateErrorMsg}</p>)}
                   </td>
                 </tr>
                 <tr>
                   <td className='a'><label >Total USD Deduction</label></td>
                   <td><input onChange={this.inputRateOrDeductionChangeHandler}
-                    type="number" name="totalUSDDeduction"
+                    type="text" name="totalUSDDeduction"
                     title="totalUSDDeduction" placeholder="US$ 100.00"
+                    style={totalUSDDeductionErrorMsg == null ? null : ({borderColor:"red"})}
                   />
+                  {totalUSDDeductionErrorMsg == null ? null : (<p className='small-txt'>{totalUSDDeductionErrorMsg}</p>)}
                   </td>
                 </tr>
                 <tr>
                   <td className='a'><label >Total INR Deduction</label></td>
                   <td><input onChange={this.inputRateOrDeductionChangeHandler}
-                    type="number" name="totalINRDeduction"
+                    type="text" name="totalINRDeduction"
                     title="totalINRDeduction" placeholder="₹ 100.00"
-                  />
+                    style={totalINRDeductionErrorMsg == null ? null : ({borderColor:"red"})}
+                  />{totalINRDeductionErrorMsg == null ? null : (<p className='small-txt'>{totalINRDeductionErrorMsg}</p>)}
                   </td>
                 </tr>
               </tbody>
@@ -318,10 +355,11 @@ export class App extends Component {
 
 
         </div>
-        <List data={data} 
-        cardPersonNameOnChangeHandler={this.inputCardPersonNameOnChangeHandler} 
-        cardAmountOnChangeHandler={this.inputCardAmountOnChangeHandler}
-        removePersonHandler={this.removePersonHandler}
+        <List data={data}
+          cardPersonNameOnChangeHandler={this.inputCardPersonNameOnChangeHandler}
+          cardAmountOnChangeHandler={this.inputCardAmountOnChangeHandler}
+          removePersonHandler={this.removePersonHandler}
+          personCardAmountErrorMsg={personCardAmountErrorMsg}
         />
       </div>
     )

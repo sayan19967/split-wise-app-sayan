@@ -236,7 +236,10 @@ input:focus::placeholder {
 }
 
 .small-txt {
- font-size: 13px;
+ font-size: 12px;
+ color: red;
+ text-align: left;
+ margin: 0px;
 }
 
 .list {
