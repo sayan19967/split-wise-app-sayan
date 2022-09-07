@@ -37,7 +37,8 @@ export class App extends Component {
       showModal: false,
       formValues: {},
       formError: undefined,
-      usdToInrRate: 0,
+      usdToInrRate: 1,
+      usdToInrRatePlaceholder: 0,
       totalUSDDeduction: 0,
       totalINRDeduction: 0,
       usdToInrRateErrorMsg: null,
@@ -52,7 +53,7 @@ export class App extends Component {
     let response = await this.fetchCurrentUSDToINRrate();
     let exchangeRateRoundedOff = this.truncateDecimals(response.inr, 2);
     this.setState({
-      usdToInrRate: exchangeRateRoundedOff
+      usdToInrRatePlaceholder: exchangeRateRoundedOff
     });
   };
 
@@ -296,7 +297,8 @@ export class App extends Component {
 
   render() {
     const { showModal, error, data, formError, usdToInrRate, totalUSDDeduction, totalINRDeduction, 
-      usdToInrRateErrorMsg, totalUSDDeductionErrorMsg, totalINRDeductionErrorMsg, personCardAmountErrorMsg } = this.state;
+      usdToInrRateErrorMsg, totalUSDDeductionErrorMsg, totalINRDeductionErrorMsg, personCardAmountErrorMsg,
+      usdToInrRatePlaceholder } = this.state;
     //console.log('hola');
     //console.log(totalUSDDeduction);
     return (
@@ -318,7 +320,7 @@ export class App extends Component {
                   <td>
                     <input onChange={this.inputRateOrDeductionChangeHandler}
                       type="text" name="usdToInrRate"
-                      title="usdToInrRate" placeholder={"Current Rate : " + usdToInrRate}
+                      title="usdToInrRate" placeholder={"Current Rate : " + usdToInrRatePlaceholder}
                       style={usdToInrRateErrorMsg == null ? null : ({borderColor:"red"})}
                     />
                     {usdToInrRateErrorMsg == null ? null : (<p className='small-txt'>{usdToInrRateErrorMsg}</p>)}
