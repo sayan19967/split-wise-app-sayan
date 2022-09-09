@@ -56,6 +56,8 @@ const Card = ({
       }
     }
   });
+
+  //deleting a row close button
   let closeElement = (_id === 'No.') ? (null) : (
     <Button onClick={(event) => removePersonHandler(event, _id)} className="btn-delete"
     id={_id}

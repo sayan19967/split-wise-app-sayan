@@ -196,12 +196,13 @@ export class App extends Component {
     //console.log("e.traget=");
     console.log(id);
     console.log(e)
-    const newData = data.filter((item) => {
+    const dataAfterDeletion = data.filter((item) => {
       return (item._id == id || item._id == 'No.') ? false : true;
     });
     console.log("rrrrrrrrrr");
-    console.log(newData);
+    console.log(dataAfterDeletion);
     console.log("rrrrrrrrrr");
+    const newData = this.calculateUsdAndInrShare(dataAfterDeletion, formValues);
     this.setState({
       data: [tableHeader, ...newData]
     });
