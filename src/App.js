@@ -102,11 +102,11 @@ export class App extends Component {
     //formValues = { ...formValues, [name]: type === "number" ? parseInt(value) : value };
     console.log(e.target)
     console.log(value)
-    if(this.validateIfStringHasDigitsOnly(value)) {
+    if (this.validateIfStringHasDigitsOnly(value)) {
       value = (type === "number") ? parseFloat(value) : value;
       await this.setState({
         [name]: value,
-        [name+"ErrorMsg"]: null
+        [name + "ErrorMsg"]: null
       });
       if (data.length > 1) {
         const newData = this.calculateUsdAndInrShare(data, formValues);
@@ -119,11 +119,11 @@ export class App extends Component {
         });
       }
       //console.log(this.state)
-    }else{
+    } else {
       console.log(value)
       await this.setState((prevState, props) => ({
         //[name]: prevState.usdToInrRate,
-        [name+"ErrorMsg"]: "Please enter digits only!"
+        [name + "ErrorMsg"]: "Please enter digits only!"
       }));
       console.log(this.state.usdToInrRate);
       console.log(this.state.usdToInrRateErrorMsg);
@@ -157,7 +157,7 @@ export class App extends Component {
     const { id, type, value } = e.target, { data, formValues } = this.state;
     console.log("changed amount " + value);
     console.log(data);
-    if(this.validateIfStringHasDigitsOnly(value)){
+    if (this.validateIfStringHasDigitsOnly(value)) {
       data.every((item) => {
         console.log("item._id=" + item._id);
         console.log("id.split('-')[1]=" + id.split('-')[1]);
@@ -181,14 +181,14 @@ export class App extends Component {
       });
       // console.log("confirmation of state change")
       // console.log(this.state.data)
-    }else{
+    } else {
       //console.log(value)
       await this.setState((prevState, props) => ({
         personCardAmountErrorMsg: "Please enter digits only!"
       }));
       console.log(data);
     }
-    
+
   }
 
   removePersonHandler = (e, id) => {
@@ -297,7 +297,7 @@ export class App extends Component {
   }
 
   render() {
-    const { showModal, error, data, formError, usdToInrRate, totalUSDDeduction, totalINRDeduction, 
+    const { showModal, error, data, formError, usdToInrRate, totalUSDDeduction, totalINRDeduction,
       usdToInrRateErrorMsg, totalUSDDeductionErrorMsg, totalINRDeductionErrorMsg, personCardAmountErrorMsg,
       usdToInrRatePlaceholder } = this.state;
     //console.log('hola');
@@ -305,15 +305,16 @@ export class App extends Component {
     return (
       <div className='justify-space'>
         <div className="app-body">
-          {/* <h2 className="app-title">{package_json.name.replace(/-/g, ' ')}</h2> */}
+          <Modal show={showModal} closeHandler={this.closeModalHandler}>
+            {/* Your code goes here */}
+            {/* Render the Form component here */}
+            <Error message={error} />
+            <Form onSaveHandler={this.submitHandler} inputOnChangeHandler={this.inputChangeHandler} ></Form>
+          </Modal>
+          <h2 className="app-title">{package_json.name.replace(/-/g, ' ')}</h2>
+          <h6>&#x2022; Developed by Sayan Halder</h6>
           <Error message={error} />
           <div className="input-group">
-            <Modal show={showModal} closeHandler={this.closeModalHandler}>
-              {/* Your code goes here */}
-              {/* Render the Form component here */}
-              <Error message={error} />
-              <Form onSaveHandler={this.submitHandler} inputOnChangeHandler={this.inputChangeHandler} ></Form>
-            </Modal>
             <table className='a'>
               <tbody className='a'>
                 <tr >
@@ -322,7 +323,7 @@ export class App extends Component {
                     <input onChange={this.inputRateOrDeductionChangeHandler}
                       type="text" name="usdToInrRate"
                       title="usdToInrRate" placeholder={"Current Rate : " + usdToInrRatePlaceholder}
-                      style={usdToInrRateErrorMsg == null ? null : ({borderColor:"red"})}
+                      style={usdToInrRateErrorMsg == null ? null : ({ borderColor: "red" })}
                     />
                     {usdToInrRateErrorMsg == null ? null : (<p className='small-txt'>{usdToInrRateErrorMsg}</p>)}
                   </td>
@@ -332,9 +333,9 @@ export class App extends Component {
                   <td><input onChange={this.inputRateOrDeductionChangeHandler}
                     type="text" name="totalUSDDeduction"
                     title="totalUSDDeduction" placeholder="US$ 100.00"
-                    style={totalUSDDeductionErrorMsg == null ? null : ({borderColor:"red"})}
+                    style={totalUSDDeductionErrorMsg == null ? null : ({ borderColor: "red" })}
                   />
-                  {totalUSDDeductionErrorMsg == null ? null : (<p className='small-txt'>{totalUSDDeductionErrorMsg}</p>)}
+                    {totalUSDDeductionErrorMsg == null ? null : (<p className='small-txt'>{totalUSDDeductionErrorMsg}</p>)}
                   </td>
                 </tr>
                 <tr>
@@ -342,7 +343,7 @@ export class App extends Component {
                   <td><input onChange={this.inputRateOrDeductionChangeHandler}
                     type="text" name="totalINRDeduction"
                     title="totalINRDeduction" placeholder="₹ 100.00"
-                    style={totalINRDeductionErrorMsg == null ? null : ({borderColor:"red"})}
+                    style={totalINRDeductionErrorMsg == null ? null : ({ borderColor: "red" })}
                   />{totalINRDeductionErrorMsg == null ? null : (<p className='small-txt'>{totalINRDeductionErrorMsg}</p>)}
                   </td>
                 </tr>
