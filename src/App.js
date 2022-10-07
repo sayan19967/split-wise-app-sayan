@@ -312,7 +312,7 @@ export class App extends Component {
             <Form onSaveHandler={this.submitHandler} inputOnChangeHandler={this.inputChangeHandler} ></Form>
           </Modal>
           <h2 className="app-title">{package_json.name.replace(/-/g, ' ')}</h2>
-          <h6>&#x2022; Developed by Sayan Halder</h6>
+          <h5>&#x2022; Developed by Sayan Halder</h5>
           <Error message={error} />
           <div className="input-group">
             <table className='a'>
